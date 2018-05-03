@@ -1,0 +1,24 @@
+{
+  "name": "Bamazon_app",
+  "version": "1.0.0",
+  "description": "A working Amazon clone app built using Javascript, Node, and MySQL",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmyager/Bamazon_app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmyager/Bamazon_app/issues"
+  },
+  "homepage": "https://github.com/jmyager/Bamazon_app#readme",
+  "dependencies": {
+    "inquirer": "^5.2.0",
+    "mysql": "^2.15.0"
+  }
+}
