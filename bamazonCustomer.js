@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var stock = 0;
+var newStock = 0;
 var price = 0;
 
 var connection = mysql.createConnection({
@@ -50,9 +51,9 @@ function buyItems() {
         var id = input.itemID;
         var amount = input.itemAmount;
         connection.query("SELECT * FROM products WHERE ?",
-            {
+            [{
                 id: id
-            }, function (err, data) {
+            }], function (err, data) {
                 if (err) throw err;
                 price = data[0].price;
                 stock = data[0].stock_quantity;
@@ -71,9 +72,10 @@ function buyItems() {
 
 // Function to update items in mysql database
 function updateItems(id, amount, stock, price) {
+    newStock = stock - amount;
     connection.query("UPDATE products SET ? WHERE ?", 
     [{
-        stock_quantity: stock - amount
+        stock_quantity: newStock
     },
     {
         id: id
