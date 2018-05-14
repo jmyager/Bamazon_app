@@ -1,7 +1,10 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require("cli-table");
 var stock = 0;
 var newStock = 0;
+var amount = 0;
+var id = 0;
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -53,12 +56,16 @@ function displayItems() {
     console.log("Listed below are all products in the store. \n");
     connection.query("SELECT * FROM products", function (err, data) {
         if (err) throw err;
-        console.log("ID | Item | Price | Stock");
-        console.log("-------------------");
+        var displayItemsTable = new Table({
+            head: ['ID', 'Item', 'Price', 'Stock']
+            , colWidths: [10, 25, 15, 15]
+        });
         for (var i = 0; i < data.length; i++) {
-            console.log(data[i].id + " | " + data[i].product_name + " | $" + data[i].price + " | stock: " + data[i].stock_quantity);
+            displayItemsTable.push(
+                [data[i].id, data[i].product_name, data[i].price, data[i].stock_quantity]
+            );
         }
-        console.log("-------------------");
+        console.log(displayItemsTable.toString());
         menu();
     })
 };
@@ -67,10 +74,16 @@ function lowInventory() {
     console.log("Listed below are all products with inventory less than 50")
     connection.query("SELECT * FROM products WHERE stock_quantity < 50", function (err, data) {
         if (err) throw err;
+        var lowInventoryTable = new Table({
+            head: ['ID', 'Item', 'Price', 'Stock']
+            , colWidths: [10, 25, 15, 15]
+        });
         for (var i = 0; i < data.length; i++) {
-            console.log(data[i].id + " | " + data[i].product_name + " | $" + data[i].price + " | " + data[i].stock_quantity);
+            lowInventoryTable.push(
+                [data[i].id, data[i].product_name, data[i].price, data[i].stock_quantity]
+            );
         }
-        console.log("-------------------");
+        console.log(lowInventoryTable.toString());
         menu();
     })
 };
@@ -89,29 +102,30 @@ function addInventory() {
             message: "How many units would you like to add?"
         }
     ]).then(function (input) {
-        var id = input.itemID;
-        var amount = input.itemAmount;
+        id = Number(input.itemID);
+        amount = Number(input.itemAmount);
         connection.query("SELECT * FROM products where ?",
             [{ id: id }],
             function (err, data) {
                 if (err) throw err;
-                stock = data[0].stock_quantity;
+                stock = Number(data[0].stock_quantity);
                 newStock = stock + amount;
+                console.log(newStock);
+                connection.query("UPDATE products SET ? WHERE ?",
+                    [{
+                        stock_quantity: newStock
+                    },
+                    {
+                        id: id
+                    }],
+                    function (err, data) {
+                        if (err) throw err;
+                        console.log("Inventory added to product!");
+                        console.log("-------------------");
+                        menu();
+                    }
+                )
             });
-        connection.query("UPDATE products SET ? WHERE ?",
-            [{
-                stock_quantity: newStock
-            },
-            {
-                id: id
-            }],
-            function (err, data) {
-                if (err) throw err;
-                console.log("Inventory added to product!");
-                console.log("-------------------");
-                menu();
-            }
-        )
     })
 }
 

@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require("cli-table");
 var stock = 0;
 var newStock = 0;
 var price = 0;
@@ -25,11 +26,16 @@ function displayItems() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         var data = res;
-        console.log("ID | Item | Price");
-        console.log("-------------------");
+        var table = new Table({
+            head: ['ID', 'Item', 'Price']
+          , colWidths: [10, 25, 15]
+        });
         for (var i = 0; i < data.length; i++) {
-            console.log(data[i].id + " | " + data[i].product_name + " | $" + data[i].price);
+            table.push(
+                [data[i].id, data[i].product_name, data[i].price]
+            );
         }
+        console.log(table.toString());
         buyItems();
     })
 };
